@@ -1,0 +1,28 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+    </style>
+
+    <style name="ToolBarStyle" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/colorAccent</item>
+        <item name="android:textColorSecondary">@color/colorAccent</item>
+        <item name="actionMenuTextColor">@color/colorAccent</item>
+    </style>
+
+    <style name="ImgTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">#000</item>
+        <item name="colorPrimaryDark">#000</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
+        <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">true</item>
+    </style>
+
+</resources>

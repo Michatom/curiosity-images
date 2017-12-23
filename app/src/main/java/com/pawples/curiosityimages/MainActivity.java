@@ -1,8 +1,13 @@
 package com.pawples.curiosityimages;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.AsyncTask;
@@ -56,6 +61,14 @@ public class MainActivity extends AppCompatActivity {
 
     private class processJSON extends AsyncTask<String, Void, String> {
 
+        private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+
+        @Override
+        protected void onPreExecute(){
+            this.dialog.setMessage("Loading");
+            this.dialog.show();
+        }
+
         protected String doInBackground(String... strings) {
             String stream = null;
             String urlString = strings[0];
@@ -65,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(String stream) {
+
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
 
             List<DataJSON> data=new ArrayList<>();
 
@@ -121,27 +138,33 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-            MyHolder myHolder = (MyHolder) holder;
+            final MyHolder myHolder = (MyHolder) holder;
             final DataJSON current = data.get(position);
             myHolder.textDate.setText("Earth date · " + current.date);
             myHolder.textId.setText("Image ID · " + current.img_id);
             myHolder.textSol.setText("Martian sol · " + current.sol);
             myHolder.textCamera.setText("Instrument · " + current.camera_name);
 
-            RequestOptions options = new RequestOptions();
+            final RequestOptions options = new RequestOptions();
             options.centerCrop();
 
             Glide.with(context)
                     .load(current.img)
                     .apply(options)
                     .into(myHolder.imageView);
+
+            ViewCompat.setTransitionName(myHolder.imageView, current.img_id);
+
             myHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent i = new Intent(view.getContext(), OpenImage.class);
-                    i.putExtra("STRING_URL", current.img);
-                    startActivity(i);
+
+                    Intent i = new Intent(view.getContext(), OpenImage.class)
+                            .putExtra("STRING_URL",current.img)
+                            .putExtra("TRANSITION_NAME", ViewCompat.getTransitionName(myHolder.imageView));
+
+                    ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity)view.getContext(),myHolder.imageView,ViewCompat.getTransitionName(myHolder.imageView));
+                    startActivity(i, optionsCompat.toBundle());
                 }
             });
 

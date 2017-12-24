@@ -4,26 +4,29 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.os.AsyncTask;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.GenericTransitionOptions;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,10 +58,11 @@ public class MainActivity extends AppCompatActivity {
         Date dayBefore = cal.getTime();
         String date = DateFormat.format("yyyy-MM-dd", dayBefore).toString();
 
-        String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date="+date+ "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
+        String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date="+ date+ "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
         new processJSON().execute(urlJson);
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class processJSON extends AsyncTask<String, Void, String> {
 
         private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
@@ -103,15 +107,12 @@ public class MainActivity extends AppCompatActivity {
                     RecyclerView recyclerView = findViewById(R.id.recycler);
                     AdapterJSON jsonAdapter = new AdapterJSON(MainActivity.this, data);
                     recyclerView.setAdapter(jsonAdapter);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                    runLayoutAnimation(recyclerView);
                 }
 
 
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            catch (NullPointerException e) {
+            } catch (JSONException | NullPointerException e) {
                 e.printStackTrace();
             }
 
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         private LayoutInflater inflater;
         List<DataJSON> data = Collections.emptyList();
 
-        public AdapterJSON(Context context, List<DataJSON> data){
+        AdapterJSON(Context context, List<DataJSON> data){
             this.context=context;
             inflater= LayoutInflater.from(context);
             this.data=data;
@@ -140,22 +141,17 @@ public class MainActivity extends AppCompatActivity {
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             final MyHolder myHolder = (MyHolder) holder;
             final DataJSON current = data.get(position);
-            myHolder.textDate.setText("Earth date · " + current.date);
             myHolder.textId.setText("Image ID · " + current.img_id);
-            myHolder.textSol.setText("Martian sol · " + current.sol);
-            myHolder.textCamera.setText("Instrument · " + current.camera_name);
-
-            final RequestOptions options = new RequestOptions();
-            options.centerCrop();
-
-            Glide.with(context)
-                    .load(current.img)
-                    .apply(options)
-                    .into(myHolder.imageView);
 
             ViewCompat.setTransitionName(myHolder.imageView, current.img_id);
 
-            myHolder.cardView.setOnClickListener(new View.OnClickListener() {
+            Glide.with(context)
+                    .asBitmap()
+                    .load(current.img)
+                    .transition(GenericTransitionOptions.with(R.anim.img_animation))
+                    .into(myHolder.imageView);
+
+            myHolder.imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
@@ -168,7 +164,33 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+            myHolder.infoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(view.getContext()).create();
+                    alertDialog.setTitle("About this image");
+                    alertDialog.setMessage("Camera - " + current.camera_name + "\nDate - " + current.date + " (sol " + current.sol + ")");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
 
+            myHolder.shareButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent share = new Intent(Intent.ACTION_SEND);
+                    share
+                            .setType("text/plain")
+                            .putExtra(Intent.EXTRA_SUBJECT, "Image from Mars")
+                            .putExtra(Intent.EXTRA_TEXT, current.img);
+                    startActivity(Intent.createChooser(share,"Share link"));
+                }
+            });
         }
 
         @Override
@@ -181,22 +203,27 @@ public class MainActivity extends AppCompatActivity {
 
             ImageView imageView;
             TextView textId;
-            TextView textDate;
-            TextView textCamera;
-            TextView textSol;
             CardView cardView;
+            ImageButton infoButton;
+            ImageButton shareButton;
 
-            public MyHolder(View itemView) {
+            MyHolder(View itemView) {
                 super(itemView);
                 imageView = itemView.findViewById(R.id.squareImg);
                 textId = itemView.findViewById(R.id.textId);
-                textCamera = itemView.findViewById(R.id.textCamera);
-                textSol = itemView.findViewById(R.id.textSol);
-                textDate = itemView.findViewById(R.id.textDate);
                 cardView = itemView.findViewById(R.id.card);
+                infoButton = itemView.findViewById(R.id.icon_info);
+                shareButton = itemView.findViewById(R.id.icon_share);
             }
 
         }
 
+    }
+    private void runLayoutAnimation(final RecyclerView recyclerView) {
+        final Context context = recyclerView.getContext();
+        final LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(context, R.anim.layout_fall_down);
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
     }
 }

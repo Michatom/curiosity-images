@@ -1,12 +1,17 @@
 package com.pawples.curiosityimages;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -47,17 +52,28 @@ public class OpenImage extends AppCompatActivity {
         img.setTransitionName(transition);
 
         Glide.with(this)
+                .asBitmap()
                 .load(urlString)
-                .listener(new RequestListener<Drawable>() {
+                .listener(new RequestListener<Bitmap>() {
                     @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                         supportStartPostponedEnterTransition();
                         return false;
                     }
 
                     @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
                         supportStartPostponedEnterTransition();
+                        final RelativeLayout relativeLayout = findViewById(R.id.relativeLayout);
+                        Palette.from(resource).maximumColorCount(16).generate(new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(Palette palette) {
+                                Palette.Swatch muted = palette.getMutedSwatch();
+                                if (muted != null) {
+                                    relativeLayout.setBackgroundColor(muted.getRgb());
+                                }
+                            }
+                        });
                         attacher = new PhotoViewAttacher(img);
                         return false;
                     }

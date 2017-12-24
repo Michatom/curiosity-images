@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.GenericTransitionOptions;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,15 +51,19 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle("Curiosity Images");
         setSupportActionBar(toolbar);
 
-        TimeZone tz = TimeZone.getTimeZone("GMT00:00");
-        Calendar cal = Calendar.getInstance(tz);
-        Date currentTime = Calendar.getInstance(tz).getTime();
-        cal.setTime(currentTime);
-        cal.add(Calendar.DATE, -1);
-        Date dayBefore = cal.getTime();
-        String date = DateFormat.format("yyyy-MM-dd", dayBefore).toString();
+        String max_date;
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if(extras == null) {
+                max_date = null;
+            } else {
+                max_date = extras.getString("MAX_DATE");
+            }
+        } else {
+            max_date = (String) savedInstanceState.getSerializable("MAX_DATE");
+        }
 
-        String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date="+ date+ "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
+        String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=" + max_date + "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
         new processJSON().execute(urlJson);
     }
 
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute(){
-            this.dialog.setMessage("Loading");
+            this.dialog.setMessage("Loading images");
             this.dialog.show();
         }
 
@@ -148,6 +153,8 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(context)
                     .asBitmap()
                     .load(current.img)
+                    .apply(new RequestOptions()
+                            .centerCrop())
                     .transition(GenericTransitionOptions.with(R.anim.img_animation))
                     .into(myHolder.imageView);
 
@@ -225,5 +232,10 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutAnimation(controller);
         recyclerView.getAdapter().notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
+    }
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        finish();
     }
 }

@@ -6,22 +6,26 @@
 
     <application
         android:allowBackup="true"
+        android:configChanges="orientation|screenSize|keyboardHidden"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:configChanges="orientation|screenSize|keyboardHidden">
-        <activity android:name=".MainActivity">
+        android:theme="@style/AppTheme">
+        <activity android:name=".LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OpenImage"
-            android:theme="@style/ImgTheme"
-            android:configChanges="orientation|screenSize|keyboardHidden"/>
+        <activity
+            android:name=".OpenImage"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/ImgTheme" />
+        <activity android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

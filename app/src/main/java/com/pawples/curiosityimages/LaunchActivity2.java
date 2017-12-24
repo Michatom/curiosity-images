@@ -9,18 +9,18 @@ import android.os.Bundle;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LaunchActivity extends AppCompatActivity {
+public class LaunchActivity2 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_launch);
-        String url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/?api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
+        setContentView(R.layout.activity_launch2);
+        String url = "https://api.nasa.gov/mars-photos/api/v1/rovers/opportunity/?api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
         new processJson().execute(url);
     }
     private class processJson extends AsyncTask<String, Void, String> {
 
-        private ProgressDialog dialog = new ProgressDialog(LaunchActivity.this);
+        private ProgressDialog dialog = new ProgressDialog(LaunchActivity2.this);
 
         @Override
         protected void onPreExecute(){
@@ -47,9 +47,9 @@ public class LaunchActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject(stream);
                 JSONObject rover = jsonObject.getJSONObject("rover");
                 final String max_date = rover.getString("max_date");
-                Intent intent = new Intent(LaunchActivity.this,MainActivity.class);
+                Intent intent = new Intent(LaunchActivity2.this,MainActivity.class);
                 intent.putExtra("MAX_DATE",max_date);
-                intent.putExtra("ROVER","curiosity");
+                intent.putExtra("ROVER","opportunity");
                 startActivity(intent);
 
             } catch (JSONException | NullPointerException e) {

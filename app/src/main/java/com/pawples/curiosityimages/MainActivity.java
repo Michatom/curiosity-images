@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,23 +48,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
-        toolbar.setTitle("Curiosity Images");
-        setSupportActionBar(toolbar);
-
         String max_date;
+        String rover;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 max_date = null;
+                rover = null;
             } else {
                 max_date = extras.getString("MAX_DATE");
+                rover = extras.getString("ROVER");
             }
         } else {
             max_date = (String) savedInstanceState.getSerializable("MAX_DATE");
+            rover = (String) savedInstanceState.getSerializable("ROVER");
         }
 
-        String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=" + max_date + "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
+        Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
+        if (Objects.equals(rover, "curiosity")){
+            toolbar.setTitle("Curiosity Images");
+        } else if (Objects.equals(rover,"opportunity")){
+            toolbar.setTitle("Opportunity Images");
+        }
+
+        setSupportActionBar(toolbar);
+
+        String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/" + rover + "/photos?earth_date=" + max_date + "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
         new processJSON().execute(urlJson);
     }
 
@@ -236,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        finish();
+        Intent i = new Intent(MainActivity.this, RoverActivity.class);
+        startActivity(i);
     }
 }

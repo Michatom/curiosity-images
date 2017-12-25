@@ -25,6 +25,7 @@ public class LaunchActivity2 extends AppCompatActivity {
         @Override
         protected void onPreExecute(){
             this.dialog.setMessage("Getting latest images");
+            this.dialog.setCancelable(false);
             this.dialog.show();
         }
 

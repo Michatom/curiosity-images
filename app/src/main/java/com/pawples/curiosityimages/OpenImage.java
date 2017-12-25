@@ -1,15 +1,11 @@
 package com.pawples.curiosityimages;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -92,7 +88,7 @@ public class OpenImage extends AppCompatActivity {
     }
     @Override
     public void onBackPressed(){
-        attacher.cleanup();
         supportFinishAfterTransition();
+        attacher.cleanup();
     }
 }

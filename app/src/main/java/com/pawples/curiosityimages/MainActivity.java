@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute(){
             this.dialog.setMessage("Loading images");
+            this.dialog.setCancelable(false);
             this.dialog.show();
         }
 

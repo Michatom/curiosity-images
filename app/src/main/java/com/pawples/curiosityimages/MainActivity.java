@@ -17,6 +17,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -249,5 +251,101 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
         Intent i = new Intent(MainActivity.this, RoverActivity.class);
         startActivity(i);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_weather) {
+            String urlWeather = "http://marsweather.ingenology.com/v1/latest/?format=json";
+            new processWeather().execute(urlWeather);
+            return true;
+        }
+        if (id == R.id.action_info) {
+            AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
+            dialog.setTitle("About");
+            dialog.setMessage("Libraries used in this application - Glide by Bumptech, PhotoView by Chris Banes and Palette, CardView, RecyclerView and Design support libraries by Google.\n\nImages from Curiosity and Opportunity rovers are NASA's property. Two images of the rovers were made by NASA.");
+            dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            dialog.show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @SuppressLint("StaticFieldLeak")
+    private class processWeather extends AsyncTask<String, Void, String> {
+        protected String doInBackground(String... strings) {
+            String stream = null;
+            String urlString = strings[0];
+            HTTPDataHandler hh = new HTTPDataHandler();
+            stream = hh.GetHTTPData(urlString);
+            return stream;
+        }
+
+        private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+
+        @Override
+        protected void onPreExecute(){
+            this.dialog.setMessage("Loading weather");
+            this.dialog.setCancelable(false);
+            this.dialog.show();
+        }
+
+        protected void onPostExecute(String stream) {
+
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
+            try {
+
+                JSONObject jsonObject = new JSONObject(stream);
+
+                final JSONObject report = jsonObject.getJSONObject("report");
+                final String terrestrial_date = report.get("terrestrial_date").toString();
+                final String sol = report.get("sol").toString();
+                final String min_temp = report.get("min_temp").toString();
+                final String min_temp_fahrenheit = report.get("min_temp_fahrenheit").toString();
+                final String max_temp = report.get("max_temp").toString();
+                final String max_temp_fahrenheit = report.get("max_temp_fahrenheit").toString();
+                final String pressure = report.get("pressure").toString();
+                final String atmo_opacity = report.get("atmo_opacity").toString();
+                final String season = report.get("season").toString();
+                final String sunrise = report.get("sunrise").toString();
+                final String sunset = report.get("sunset").toString();
+
+                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
+                dialog.setTitle("Weather on Mars");
+                dialog.setMessage("Weather measurement date · " + terrestrial_date + " (sol " + sol + ")" +
+                        "\n\nMax temperature · " + max_temp + "°C (" + max_temp_fahrenheit + "°F)" +
+                        "\nMinimal temperature · " + min_temp + "°C (" + min_temp_fahrenheit + "°F)" +
+                        "\nAtmospheric conditions · " + atmo_opacity +
+                        "\nPressure · " + pressure + " pascals" +
+                        "\nSeason · " + season +
+                        "\nSunrise · " + sunrise +
+                        "\nSunset · " + sunset);
+                dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                dialog.show();
+            } catch (JSONException | NullPointerException e) {
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+                e.printStackTrace();
+            }
+        }
     }
 }

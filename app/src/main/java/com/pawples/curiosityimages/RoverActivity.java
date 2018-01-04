@@ -54,7 +54,7 @@ public class RoverActivity extends AppCompatActivity {
             public void onClick(View view) {
                 AlertDialog dialog = new AlertDialog.Builder(RoverActivity.this).create();
                 dialog.setTitle("About");
-                dialog.setMessage("Libraries used in this application - Glide by Bumptech, PhotoView by Chris Banes and Palette, CardView, RecyclerView and Design support libraries by Google.\n\nImages from Curiosity and Opportunity rovers are NASA's property. Two images of the rovers were made by NASA.");
+                dialog.setMessage("Libraries used in this application - Glide by Bumptech, PhotoView by Chris Banes, RxDownloader by esafirm, Dexter by Karumi and Palette, CardView, RecyclerView and Design support libraries by Google.\n\nImages from Curiosity and Opportunity rovers are NASA's property. Two images of the rovers were made by NASA.");
                 dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {

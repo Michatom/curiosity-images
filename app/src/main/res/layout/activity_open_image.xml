@@ -13,4 +13,16 @@
         android:layout_height="match_parent"
         android:id="@+id/openImageView"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabDownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="48dp"
+        android:src="@drawable/ic_download_white_24dp"
+        app:backgroundTint="@color/colorAccent"
+        app:fabSize="normal"
+        app:useCompatPadding="true" />
+
 </RelativeLayout>

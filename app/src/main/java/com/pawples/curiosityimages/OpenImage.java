@@ -31,7 +31,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class OpenImage extends AppCompatActivity {
 
-    PhotoViewAttacher attacher;
+    private PhotoViewAttacher attacher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

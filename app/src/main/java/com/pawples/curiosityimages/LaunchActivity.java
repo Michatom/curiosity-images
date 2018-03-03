@@ -20,7 +20,7 @@ public class LaunchActivity extends AppCompatActivity {
     }
     private class processJson extends AsyncTask<String, Void, String> {
 
-        private ProgressDialog dialog = new ProgressDialog(LaunchActivity.this);
+        private final ProgressDialog dialog = new ProgressDialog(LaunchActivity.this);
 
         @Override
         protected void onPreExecute(){

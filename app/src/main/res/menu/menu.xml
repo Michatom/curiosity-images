@@ -5,6 +5,13 @@
     tools:context=".MainActivity">
 
     <item
+        android:id="@+id/action_date"
+        android:orderInCategory="100"
+        android:title="Date"
+        android:icon="@drawable/calendar"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_info"
         android:orderInCategory="200"
         android:title="About"

@@ -2,7 +2,6 @@ package com.pawples.curiosityimages;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,13 +16,10 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,64 +33,50 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
-
-    private DatePickerDialog.OnDateSetListener dateSetListener;
+public class DateActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_date);
 
-        String max_date;
-        final String rover;
+        String date;
+        String rover;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
-                max_date = null;
+                date = null;
                 rover = null;
             } else {
-                max_date = extras.getString("MAX_DATE");
+                date = extras.getString("DATE");
                 rover = extras.getString("ROVER");
             }
         } else {
-            max_date = (String) savedInstanceState.getSerializable("MAX_DATE");
+            date = (String) savedInstanceState.getSerializable("DATE");
             rover = (String) savedInstanceState.getSerializable("ROVER");
         }
 
         Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
         if (Objects.equals(rover, "curiosity")){
-            toolbar.setTitle("Curiosity Images");
+            toolbar.setTitle("Curiosity Images (" + date + ")");
         } else if (Objects.equals(rover,"opportunity")){
-            toolbar.setTitle("Opportunity Images");
+            toolbar.setTitle("Opportunity Images (" + date + ")");
         }
 
         setSupportActionBar(toolbar);
 
-        String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/" + rover + "/photos?earth_date=" + max_date + "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
+        String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/" + rover + "/photos?earth_date=" + date + "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
         new processJSON().execute(urlJson);
-
-        dateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                month = month + 1;
-                Intent i = new Intent(MainActivity.this,DateActivity.class);
-                i.putExtra("DATE",year+"-" + month + "-" + day);
-                i.putExtra("ROVER",rover);
-                startActivity(i);
-            }
-        };
     }
 
     @SuppressLint("StaticFieldLeak")
     private class processJSON extends AsyncTask<String, Void, String> {
 
-        private final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+        private final ProgressDialog dialog = new ProgressDialog(DateActivity.this);
 
         @Override
         protected void onPreExecute(){
@@ -135,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                     data.add(dataJSON);
 
                     RecyclerView recyclerView = findViewById(R.id.recycler);
-                    AdapterJSON jsonAdapter = new AdapterJSON(MainActivity.this, data);
+                    AdapterJSON jsonAdapter = new AdapterJSON(DateActivity.this, data);
                     recyclerView.setAdapter(jsonAdapter);
                     runLayoutAnimation(recyclerView);
                 }
@@ -261,40 +243,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         super.onBackPressed();
-        Intent i = new Intent(MainActivity.this, RoverActivity.class);
+        Intent i = new Intent(DateActivity.this, RoverActivity.class);
         startActivity(i);
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_date) {
-            Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this,dateSetListener,year,month,day);
-            datePickerDialog.show();
-        }
-
-        if (id == R.id.action_info) {
-            AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
-            dialog.setTitle("About");
-            dialog.setMessage("Libraries used in this application - Glide by Bumptech, PhotoView by Chris Banes, RxDownloader by esafirm, Dexter by Karumi and Palette, CardView, RecyclerView and Design support libraries by Google.\n\nImages from Curiosity and Opportunity rovers are NASA's property. Two images of the rovers were made by NASA.");
-            dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            dialog.show();
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

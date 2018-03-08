@@ -3,7 +3,7 @@
     package="com.pawples.curiosityimages">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -40,6 +40,9 @@
             android:name=".LaunchActivity2"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/AppTheme" />
+        <activity android:name=".AboutRoverActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/AppTheme"/>
     </application>
 
 </manifest>

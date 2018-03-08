@@ -27,6 +27,7 @@ import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.GenericTransitionOptions;
 import com.bumptech.glide.Glide;
@@ -36,35 +37,61 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private DatePickerDialog.OnDateSetListener dateSetListener;
 
+    String max_date;
+    String rover;
+    String max_sol;
+    String status;
+    String total_photos;
+    String landing_date;
+    String launch_date;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String max_date;
-        final String rover;
+
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
                 max_date = null;
                 rover = null;
+                max_sol = null;
+                status = null;
+                total_photos = null;
+                landing_date = null;
+                launch_date = null;
             } else {
                 max_date = extras.getString("MAX_DATE");
                 rover = extras.getString("ROVER");
+                max_sol = extras.getString("MAX_SOL");
+                status = extras.getString("STATUS");
+                total_photos = extras.getString("TOTAL_PHOTOS");
+                landing_date = extras.getString("LANDING_DATE");
+                launch_date = extras.getString("LAUNCH_DATE");
             }
         } else {
             max_date = (String) savedInstanceState.getSerializable("MAX_DATE");
             rover = (String) savedInstanceState.getSerializable("ROVER");
+            max_sol = (String) savedInstanceState.getSerializable("MAX_SOL");
+            status = (String) savedInstanceState.getSerializable("STATUS");
+            total_photos = (String) savedInstanceState.getSerializable("TOTAL_PHOTOS");
+            landing_date = (String) savedInstanceState.getSerializable("LANDING_DATE");
+            launch_date = (String) savedInstanceState.getSerializable("LAUNCH_DATE");
         }
 
         Toolbar toolbar = findViewById(R.id.toolbar_actionbar);
@@ -179,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                     .asBitmap()
                     .load(current.img)
                     .apply(new RequestOptions()
-                            .centerCrop())
+                            .centerInside())
                     .transition(GenericTransitionOptions.with(R.anim.img_animation))
                     .into(myHolder.imageView);
 
@@ -283,17 +310,15 @@ public class MainActivity extends AppCompatActivity {
             datePickerDialog.show();
         }
 
-        if (id == R.id.action_info) {
-            AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
-            dialog.setTitle("About");
-            dialog.setMessage("Libraries used in this application - Glide by Bumptech, PhotoView by Chris Banes, RxDownloader by esafirm, Dexter by Karumi and Palette, CardView, RecyclerView and Design support libraries by Google.\n\nImages from Curiosity and Opportunity rovers are NASA's property. Two images of the rovers were made by NASA.");
-            dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            dialog.show();
+        if (id == R.id.action_rover_info) {
+            Intent i = new Intent(MainActivity.this,AboutRoverActivity.class);
+            i.putExtra("ROVER",rover);
+            i.putExtra("MAX_SOL",max_sol);
+            i.putExtra("STATUS",status);
+            i.putExtra("TOTAL_PHOTOS",total_photos);
+            i.putExtra("LANDING_DATE",landing_date);
+            i.putExtra("LAUNCH_DATE",launch_date);
+            startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }

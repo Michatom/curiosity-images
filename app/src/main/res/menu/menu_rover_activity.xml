@@ -5,16 +5,9 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_date"
-        android:orderInCategory="100"
-        android:title="Date"
-        android:icon="@drawable/calendar"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_rover_info"
+        android:id="@+id/action_about_app"
         android:orderInCategory="200"
-        android:title="About this rover"
+        android:title="About"
         android:icon="@drawable/information"
         app:showAsAction="ifRoom" />
 

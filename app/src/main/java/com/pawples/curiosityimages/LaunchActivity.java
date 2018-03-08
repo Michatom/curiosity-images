@@ -48,9 +48,23 @@ public class LaunchActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject(stream);
                 JSONObject rover = jsonObject.getJSONObject("rover");
                 final String max_date = rover.getString("max_date");
+                final String max_sol = rover.getString("max_sol");
+                final String status = rover.getString("status");
+                final int total_photos_int = rover.getInt("total_photos");
+                final String total_photos = String.valueOf(total_photos_int);
+                final String landing_date = rover.getString("landing_date");
+                final String launch_date = rover.getString("launch_date");
+
                 Intent intent = new Intent(LaunchActivity.this,MainActivity.class);
                 intent.putExtra("MAX_DATE",max_date);
                 intent.putExtra("ROVER","curiosity");
+                //for rover status
+                intent.putExtra("MAX_SOL",max_sol);
+                intent.putExtra("STATUS",status);
+                intent.putExtra("TOTAL_PHOTOS",total_photos);
+                intent.putExtra("LANDING_DATE",landing_date);
+                intent.putExtra("LAUNCH_DATE",launch_date);
+
                 startActivity(intent);
 
             } catch (JSONException | NullPointerException e) {

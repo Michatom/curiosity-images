@@ -10,10 +10,6 @@
         <item name="android:datePickerDialogTheme">@style/DatePickerDialogTheme</item>
     </style>
 
-    <style name="DatePickerStyle" parent="@android:style/Widget.Material.Light.DatePicker">
-        <item name="android:headerBackground">@color/colorAccent</item>
-    </style>
-
     <style name="DatePickerDialogTheme" parent="android:Theme.Material.Light.Dialog">
         <item name="android:colorAccent">@color/colorAccent</item>
     </style>

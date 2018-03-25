@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RoverActivity">
+        <activity android:name=".input.RoverActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,14 +33,15 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".LaunchActivity"
+            android:name=".input.LaunchActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".LaunchActivity2"
+            android:name=".input.LaunchActivity2"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/AppTheme" />
-        <activity android:name=".AboutRoverActivity"
+        <activity
+            android:name=".AboutRoverActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/AppTheme"/>
     </application>

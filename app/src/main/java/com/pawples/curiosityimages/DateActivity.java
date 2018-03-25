@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -16,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +25,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.GenericTransitionOptions;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.pawples.curiosityimages.input.RoverActivity;
+import com.pawples.curiosityimages.utils.DataJSON;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,66 +78,59 @@ public class DateActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         String urlJson = "https://api.nasa.gov/mars-photos/api/v1/rovers/" + rover + "/photos?earth_date=" + date + "&api_key=BldvqDsBvxhlFq4w3x1kFgijM4lR2nGE1L3uqdDM";
-        new processJSON().execute(urlJson);
-    }
 
-    @SuppressLint("StaticFieldLeak")
-    private class processJSON extends AsyncTask<String, Void, String> {
+        final ProgressDialog dialog = new ProgressDialog(DateActivity.this);
+        dialog.setMessage("Loading images");
+        dialog.setCancelable(false);
+        dialog.show();
 
-        private final ProgressDialog dialog = new ProgressDialog(DateActivity.this);
+        StringRequest stringRequest = new StringRequest(urlJson, new Response.Listener<String>() {
 
-        @Override
-        protected void onPreExecute(){
-            this.dialog.setMessage("Loading images");
-            this.dialog.setCancelable(false);
-            this.dialog.show();
-        }
+            @Override
+            public void onResponse(String response) {
 
-        protected String doInBackground(String... strings) {
-            String stream = null;
-            String urlString = strings[0];
-            HTTPDataHandler hh = new HTTPDataHandler();
-            stream = hh.GetHTTPData(urlString);
-            return stream;
-        }
-
-        protected void onPostExecute(String stream) {
-
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-
-            List<DataJSON> data=new ArrayList<>();
-
-            try {
-
-                JSONObject jsonObject = new JSONObject(stream);
-                JSONArray jsonArray = jsonObject.getJSONArray("photos");
-
-                for(int i=0;i<jsonArray.length();i++){
-                    DataJSON dataJSON = new DataJSON();
-                    dataJSON.img = jsonArray.getJSONObject(i).getString("img_src");
-                    dataJSON.img_id = jsonArray.getJSONObject(i).getString("id");
-                    dataJSON.date = jsonArray.getJSONObject(i).getString("earth_date");
-                    dataJSON.sol = jsonArray.getJSONObject(i).getString("sol");
-                    JSONObject cameraObject = jsonArray.getJSONObject(i).getJSONObject("camera");
-                    dataJSON.camera_name = cameraObject.getString("full_name");
-                    data.add(dataJSON);
-
-                    RecyclerView recyclerView = findViewById(R.id.recycler);
-                    AdapterJSON jsonAdapter = new AdapterJSON(DateActivity.this, data);
-                    recyclerView.setAdapter(jsonAdapter);
-                    runLayoutAnimation(recyclerView);
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
                 }
 
+                List<DataJSON> data = new ArrayList<>();
 
+                try {
 
-            } catch (JSONException | NullPointerException e) {
-                e.printStackTrace();
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("photos");
+
+                    for(int i=0;i<jsonArray.length();i++){
+                        DataJSON dataJSON = new DataJSON();
+                        dataJSON.img = jsonArray.getJSONObject(i).getString("img_src");
+                        dataJSON.img_id = jsonArray.getJSONObject(i).getString("id");
+                        dataJSON.date = jsonArray.getJSONObject(i).getString("earth_date");
+                        dataJSON.sol = jsonArray.getJSONObject(i).getString("sol");
+                        JSONObject cameraObject = jsonArray.getJSONObject(i).getJSONObject("camera");
+                        dataJSON.camera_name = cameraObject.getString("full_name");
+                        data.add(dataJSON);
+
+                        RecyclerView recyclerView = findViewById(R.id.recycler);
+                        DateActivity.AdapterJSON jsonAdapter = new AdapterJSON(DateActivity.this, data);
+                        recyclerView.setAdapter(jsonAdapter);
+                        runLayoutAnimation(recyclerView);
+                    }
+
+                } catch (JSONException | NullPointerException e) {
+                    Log.e("E","Error: ", e);
+                }
             }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("E","Volley error: ", error);
+            }
+        });
+        RequestQueue requestQueue = Volley.newRequestQueue(DateActivity.this);
+        requestQueue.add(stringRequest);
 
-        }
     }
+
     class AdapterJSON extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private final Context context;

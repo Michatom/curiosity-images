@@ -1,6 +1,5 @@
-package com.pawples.curiosityimages;
+package com.pawples.curiosityimages.input;
 
-import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -15,8 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.GenericTransitionOptions;
 import com.bumptech.glide.Glide;
-
-import java.util.Calendar;
+import com.pawples.curiosityimages.R;
 
 public class RoverActivity extends AppCompatActivity {
 
@@ -42,24 +40,27 @@ public class RoverActivity extends AppCompatActivity {
         cardCuriosity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent curiosity = new Intent(RoverActivity.this,LaunchActivity.class);
-                startActivity(curiosity);
+                Intent i = new Intent(RoverActivity.this,LaunchActivity.class);
+                i.putExtra("ROVER","curiosity");
+                startActivity(i);
             }
         });
 
         cardOpportunity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent opportunity = new Intent(RoverActivity.this,LaunchActivity2.class);
-                startActivity(opportunity);
+                Intent i = new Intent(RoverActivity.this,LaunchActivity.class);
+                i.putExtra("ROVER","opportunity");
+                startActivity(i);
             }
         });
+
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog dialog = new AlertDialog.Builder(RoverActivity.this).create();
                 dialog.setTitle("About");
-                dialog.setMessage("Libraries used in this application - Glide by Bumptech, PhotoView by Chris Banes, RxDownloader by esafirm, Dexter by Karumi and Palette, CardView, RecyclerView and Design support libraries by Google.\n\nImages from Curiosity and Opportunity rovers are NASA's property. Two images of the rovers were made by NASA.");
+                dialog.setMessage("Libraries used in this application - Glide by Bumptech, PhotoView by Chris Banes, RxDownloader by esafirm, Dexter by Karumi and Palette, Volley, CardView, RecyclerView and Design support libraries by Google.\n\nImages from Curiosity and Opportunity rovers are NASA's property. Two images of the rovers were made by NASA.");
                 dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {

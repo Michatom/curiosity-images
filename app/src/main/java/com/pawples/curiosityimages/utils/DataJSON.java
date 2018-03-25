@@ -1,7 +1,7 @@
-package com.pawples.curiosityimages;
+package com.pawples.curiosityimages.utils;
 
-class DataJSON {
-    String img;
+public class DataJSON {
+    public String img;
     public String img_id;
     public String date;
     public String sol;

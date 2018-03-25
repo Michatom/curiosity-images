@@ -1,4 +1,4 @@
-package com.pawples.curiosityimages;
+package com.pawples.curiosityimages.utils;
 
 import android.content.Context;
 import android.util.AttributeSet;

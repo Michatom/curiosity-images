@@ -2,6 +2,7 @@ package com.pawples.curiosityimages;
 
 import android.Manifest;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -37,29 +38,91 @@ public class OpenImage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_image);
-        supportPostponeEnterTransition();
-
+        final ImageView img = findViewById(R.id.openImageView);
         FloatingActionButton floatingActionButton = findViewById(R.id.fabDownload);
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            supportPostponeEnterTransition();
+        }
+
+        if (Build.VERSION.SDK_INT < 21) {
+            floatingActionButton.setVisibility(View.GONE);
+        }
 
         final String urlString;
         final String transition;
-        if (savedInstanceState == null) {
-            Bundle extras = getIntent().getExtras();
-            if(extras == null) {
-                urlString = null;
-                transition = null;
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            if (savedInstanceState == null) {
+                Bundle extras = getIntent().getExtras();
+                if(extras == null) {
+                    urlString = null;
+                    transition = null;
+                } else {
+                    urlString = extras.getString("STRING_URL");
+                    transition = extras.getString("TRANSITION_NAME");
+                }
             } else {
-                urlString = extras.getString("STRING_URL");
-                transition = extras.getString("TRANSITION_NAME");
+                urlString = (String) savedInstanceState.getSerializable("STRING_URL");
+                transition = (String) savedInstanceState.getSerializable("TRANSITION_NAME");
             }
+
+            img.setTransitionName(transition);
+
+            floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Dexter.withActivity(OpenImage.this)
+                            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            .withListener(new PermissionListener() {
+                                @Override
+                                public void onPermissionGranted(PermissionGrantedResponse response) {
+                                    RxDownloader.getInstance(OpenImage.this)
+                                            .download(urlString,transition + ".JPG", "image/jpg")
+                                            .subscribe(new Subscriber<String>() {
+                                                @Override
+                                                public void onCompleted() {
+
+                                                }
+
+                                                @Override
+                                                public void onError(Throwable e) {
+                                                    Toast.makeText(OpenImage.this,"Error: " + e, Toast.LENGTH_SHORT).show();
+                                                }
+
+                                                @Override
+                                                public void onNext(String s) {
+
+                                                }
+                                            });
+                                }
+
+                                @Override
+                                public void onPermissionDenied(PermissionDeniedResponse response) {
+                                    Toast.makeText(OpenImage.this,"Can't download the image.",Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            })
+                            .check();
+                }
+            });
+
         } else {
-            urlString = (String) savedInstanceState.getSerializable("STRING_URL");
-            transition = (String) savedInstanceState.getSerializable("TRANSITION_NAME");
+            if (savedInstanceState == null) {
+                Bundle extras = getIntent().getExtras();
+                if(extras == null) {
+                    urlString = null;
+                } else {
+                    urlString = extras.getString("STRING_URL");
+                }
+            } else {
+                urlString = (String) savedInstanceState.getSerializable("STRING_URL");
+            }
         }
-
-        final ImageView img = findViewById(R.id.openImageView);
-
-        img.setTransitionName(transition);
 
         Glide.with(this)
                 .asBitmap()
@@ -89,62 +152,28 @@ public class OpenImage extends AppCompatActivity {
                     }
                 })
                 .into(img);
-
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Dexter.withActivity(OpenImage.this)
-                        .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        .withListener(new PermissionListener() {
-                            @Override
-                            public void onPermissionGranted(PermissionGrantedResponse response) {
-                                RxDownloader.getInstance(OpenImage.this)
-                                        .download(urlString,transition + ".JPG", "image/jpg")
-                                        .subscribe(new Subscriber<String>() {
-                                            @Override
-                                            public void onCompleted() {
-
-                                            }
-
-                                            @Override
-                                            public void onError(Throwable e) {
-                                                Toast.makeText(OpenImage.this,"Error: " + e, Toast.LENGTH_SHORT).show();
-                                            }
-
-                                            @Override
-                                            public void onNext(String s) {
-
-                                            }
-                                        });
-                            }
-
-                            @Override
-                            public void onPermissionDenied(PermissionDeniedResponse response) {
-                                Toast.makeText(OpenImage.this,"Can't download the image.",Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                                token.continuePermissionRequest();
-                            }
-                        })
-                        .check();
-            }
-        });
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
             case android.R.id.home:
                 attacher.cleanup();
-                supportFinishAfterTransition();
+                if (Build.VERSION.SDK_INT >= 21) {
+                    supportFinishAfterTransition();
+                } else {
+                    finish();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
     @Override
     public void onBackPressed(){
-        supportFinishAfterTransition();
+        if (Build.VERSION.SDK_INT >= 21) {
+            supportFinishAfterTransition();
+        } else {
+            finish();
+        }
         attacher.cleanup();
     }
 }

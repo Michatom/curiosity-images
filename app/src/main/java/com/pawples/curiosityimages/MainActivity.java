@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
@@ -200,7 +201,9 @@ public class MainActivity extends AppCompatActivity {
             final DataJSON current = data.get(position);
             myHolder.textId.setText("Image ID · " + current.img_id);
 
-            ViewCompat.setTransitionName(myHolder.imageView, current.img_id);
+            if (Build.VERSION.SDK_INT >= 21) {
+                ViewCompat.setTransitionName(myHolder.imageView, current.img_id);
+            }
 
             Glide.with(context)
                     .asBitmap()
@@ -214,12 +217,18 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
 
-                    Intent i = new Intent(view.getContext(), OpenImage.class)
-                            .putExtra("STRING_URL",current.img)
-                            .putExtra("TRANSITION_NAME", ViewCompat.getTransitionName(myHolder.imageView));
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        Intent i = new Intent(view.getContext(), OpenImage.class)
+                                .putExtra("STRING_URL",current.img)
+                                .putExtra("TRANSITION_NAME", ViewCompat.getTransitionName(myHolder.imageView));
 
-                    ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity)view.getContext(),myHolder.imageView,ViewCompat.getTransitionName(myHolder.imageView));
-                    startActivity(i, optionsCompat.toBundle());
+                        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity)view.getContext(),myHolder.imageView,ViewCompat.getTransitionName(myHolder.imageView));
+                        startActivity(i, optionsCompat.toBundle());
+                    } else {
+                        Intent i = new Intent(view.getContext(), OpenImage.class)
+                                .putExtra("STRING_URL",current.img);
+                        startActivity(i);
+                    }
                 }
             });
 
